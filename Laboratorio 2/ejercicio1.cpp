@@ -29,7 +29,7 @@ public:
         }
 
         if (numbers.size() > 6) {
-            cerr << "Error: Se permiten como máximo 6 números." << endl;
+            cerr << "Error: Se permiten como maximo 6 numeros." << endl;
             numbers.clear();
             operators.clear();
         }
@@ -95,7 +95,7 @@ int main() {
     CalculatorProcessor processor;
     string expression;
 
-    cout << "Ingrese una operación (máx 6 números): ";
+    cout << "Ingrese una operacion (max 6 numeros): ";
     cin >> expression;
 
     processor.process(expression);
