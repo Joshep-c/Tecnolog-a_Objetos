@@ -3,20 +3,21 @@
 #include <vector>
 #include <cctype>
 
+using namespace std;
+
 class OperationAnalyzer {
 public:
-    // Función para analizar la operación
-    void analyze(const std::string& expression) {
-        std::vector<char> operators;
-        std::vector<int> numbers;
-        std::string temp = "";
+    void analyze(const string& expression) {
+        vector<char> operators;
+        vector<int> numbers;
+        string temp = "";
 
         for (char ch : expression) {
             if (isdigit(ch)) {
                 temp += ch;
             } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
                 if (!temp.empty()) {
-                    numbers.push_back(std::stoi(temp));
+                    numbers.push_back(stoi(temp));
                     temp = "";
                 }
                 operators.push_back(ch);
@@ -24,24 +25,36 @@ public:
         }
 
         if (!temp.empty()) {
-            numbers.push_back(std::stoi(temp));
+            numbers.push_back(stoi(temp));
         }
 
         if (numbers.size() > 6) {
-            std::cerr << "Error: Se permiten como máximo 6 números." << std::endl;
+            cerr << "Error: Se permiten como maximo 6 numeros." << endl;
             return;
         }
 
-        std::cout << "Operadores: ";
+        cout << "Operadores: ";
         for (char op : operators) {
-            std::cout << op << ' ';
+            cout << op << ' ';
         }
-        std::cout << std::endl;
+        cout << endl;
 
-        std::cout << "Números: ";
+        cout << "Numeros: ";
         for (int num : numbers) {
-            std::cout << num << ' ';
+            cout << num << ' ';
         }
-        std::cout << std::endl;
+        cout << endl;
     }
 };
+
+int main() {
+    OperationAnalyzer analyzer;
+    string expression;
+
+    cout << "Ingrese una operacion (max 6 numeros): ";
+    cin >> expression;
+
+    analyzer.analyze(expression);
+
+    return 0;
+}
