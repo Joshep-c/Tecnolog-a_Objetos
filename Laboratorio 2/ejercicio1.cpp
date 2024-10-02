@@ -1,25 +1,23 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cctype>
+#include <stack>
 
 using namespace std;
 
-class OperationAnalyzer {
+class CalculatorCore {
 public:
-    void analyze(const string& expression) {
-        vector<char> operators;
+    int calculate(const string& expression) {
         vector<int> numbers;
+        vector<char> operators;
         string temp = "";
 
         for (char ch : expression) {
             if (isdigit(ch)) {
                 temp += ch;
             } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
-                if (!temp.empty()) {
-                    numbers.push_back(stoi(temp));
-                    temp = "";
-                }
+                numbers.push_back(stoi(temp));
+                temp = "";
                 operators.push_back(ch);
             }
         }
@@ -28,33 +26,56 @@ public:
             numbers.push_back(stoi(temp));
         }
 
-        if (numbers.size() > 6) {
-            cerr << "Error: Se permiten como maximo 6 numeros." << endl;
-            return;
+        int result = evaluatePriorityOperations(numbers, operators);
+        return result;
+    }
+
+private:
+    int evaluatePriorityOperations(vector<int>& numbers, vector<char>& operators) {
+        stack<int> numStack;
+        numStack.push(numbers[0]);
+
+        for (size_t i = 0; i < operators.size(); ++i) {
+            char op = operators[i];
+            if (op == '*' || op == '/') {
+                int num1 = numStack.top();
+                numStack.pop();
+                int num2 = numbers[i + 1];
+                int result = (op == '*') ? num1 * num2 : num1 / num2;
+                numStack.push(result);
+            } else {
+                numStack.push(numbers[i + 1]);
+            }
         }
 
-        cout << "Operadores: ";
-        for (char op : operators) {
-            cout << op << ' ';
-        }
-        cout << endl;
+        return evaluateRemaining(numStack, operators);
+    }
 
-        cout << "Numeros: ";
-        for (int num : numbers) {
-            cout << num << ' ';
+    int evaluateRemaining(stack<int>& numStack, vector<char>& operators) {
+        int result = numStack.top();
+        numStack.pop();
+
+        for (size_t i = 0; i < operators.size(); ++i) {
+            if (operators[i] == '+' || operators[i] == '-') {
+                int num = numStack.top();
+                numStack.pop();
+                result = (operators[i] == '+') ? result + num : result - num;
+            }
         }
-        cout << endl;
+
+        return result;
     }
 };
 
 int main() {
-    OperationAnalyzer analyzer;
+    CalculatorCore core;
     string expression;
 
-    cout << "Ingrese una operacion (max 6 numeros): ";
+    cout << "Ingrese una operacion matematica (max 6 numeros): ";
     cin >> expression;
 
-    analyzer.analyze(expression);
+    int result = core.calculate(expression);
+    cout << "Resultado: " << result << endl;
 
     return 0;
 }
