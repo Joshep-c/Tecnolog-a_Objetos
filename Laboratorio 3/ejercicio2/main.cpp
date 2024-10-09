@@ -1,32 +1,4 @@
 #include <iostream>
-#include <iomanip>
-#include "time.h"
-using namespace std;
-Time::Time(const int h, const int m, const int s)
-    : hour(make_unique<int>(h)),
-      minute(make_unique<int>(m)),
-      second(make_unique<int>(s))
-{
-}
-void Time::setTime(const int h, const int m, const int s)
-{
-    *hour = h; // Asignación a través del puntero
-    *minute = m;
-    *second = s;
-}
-void Time::print() const
-{
-    cout << setw(2) << setfill('0') << *hour << ":"
-         << setw(2) << setfill('0') << *minute << ":"
-         << setw(2) << setfill('0') << *second << "\n";
-}
-bool Time::equals(const Time &otherTime) const
-{
-    return (*hour == *otherTime.hour &&
-            *minute == *otherTime.minute &&
-            *second == *otherTime.second);
-}
-#include <iostream>
 #include "time.h"
 using namespace std;
 int main()

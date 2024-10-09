@@ -8,6 +8,7 @@ Time::Time(const int h, const int m, const int s)
       second(make_unique<int>(s))
 {
 }
+
 void Time::setTime(const int h, const int m, const int s)
 {
     *hour = h; // Asignación por el puntero
