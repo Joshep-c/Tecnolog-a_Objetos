@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Estilo del QListWidget
+    // Estilo de la lista
     ui->listWidget->setStyleSheet(
         "QListWidget::item {"
         "   font-size: 18px;"
@@ -22,14 +22,15 @@ MainWindow::MainWindow(QWidget *parent)
         "}"
         );
 
+    // Estilo del label de resultado
     ui->infoLabel->setStyleSheet(
         "QLabel {"
         "   font-size: 16px;"
-        "   border: 1px solid #808080;"   // Borde gris
-        "   padding: 10px;"               // Espaciado interior
-        "   margin-top: 10px;"            // Separación superior
-        "   background-color: #2D2D2D;"   // Fondo gris claro
-        "   border-radius: 5px;"          // Bordes redondeados
+        "   border: 1px solid #808080;"
+        "   padding: 10px;"
+        "   margin-top: 10px;"
+        "   background-color: #2D2D2D;"
+        "   border-radius: 5px;"
         "}"
         );
 
