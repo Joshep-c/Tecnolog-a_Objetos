@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
         "QListWidget::item {"
         "   font-size: 18px;"
         "   text-align: center;"
-        "   border: 1px solid #808080;"    // Gris en hexadecimal
+        "   border: 1px solid #808080;"
         "   padding: 5px;"
         "   margin: 5px;"
         "}"
@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
         "   border: 1px solid #808080;"   // Borde gris
         "   padding: 10px;"               // Espaciado interior
         "   margin-top: 10px;"            // Separación superior
-        "   background-color: #F0F0F0;"   // Fondo gris claro
+        "   background-color: #2D2D2D;"   // Fondo gris claro
         "   border-radius: 5px;"          // Bordes redondeados
         "}"
         );
