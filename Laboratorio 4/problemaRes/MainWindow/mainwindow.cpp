@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->addTaskButton, &QPushButton::clicked, this, &MainWindow::onAddTaskButtonClicked);
-    connect(ui->addTaskButton, &QPushButton::clicked, QApplication::instance(), &QApplication::quit);
     connect(ui->addTaskButton, &QPushButton::clicked, this, &MainWindow::addTask);
 }
 
