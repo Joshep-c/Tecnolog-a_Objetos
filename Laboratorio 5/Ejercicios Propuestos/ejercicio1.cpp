@@ -67,9 +67,10 @@ int main() {
 
     // Lista de cadenas (secuencia de palabras)
     LinkedList<std::string> wordList;
-    wordList.append("Hola");
-    wordList.append("mundo");
-    wordList.append("template");
+    wordList.append("Curso");
+    wordList.append("Tecnologia");
+    wordList.append("de");
+    wordList.append("Objetos");
     std::cout << "Secuencia de palabras: ";
     wordList.print();
 
