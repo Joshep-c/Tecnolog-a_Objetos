@@ -1,16 +1,19 @@
 #include <iostream>
 #include <vector>
 
+class AbstractProductA;
+class AbstractProductB;
+
 class AbstractFactory{
     public:
-        virtual AbstractProductA* createProductA() = 0;
-        virtual AbstractProductB* createProductB() = 0;
+        virtual AbstractProductA* createProductoA() const = 0;
+        virtual AbstractProductB* createProductoB() const = 0;
 };
 
 class AbstractProductA{
     public:
-        virtual AbstractProductA() {};
-        virtual std::string Funcion1_A() = 0;
+        virtual ~AbstractProductA() {};
+        virtual std::string Funcion1_A() const = 0;
 };
 
 class CProductoA1 : public AbstractProductA{
@@ -29,7 +32,7 @@ class CProductoA2 : public AbstractProductA{
 
 class AbstractProductB{
     public:
-        virtual AbstractProductB() {};
+        virtual ~AbstractProductB() {};
         virtual std::string Funcion1_B() const = 0;
         virtual std::string Funcion2_B (const AbstractProductA& colaborador) const = 0;
 };
@@ -58,27 +61,27 @@ class CProductoB2 : public AbstractProductB{
 
 class CFactory1 : public AbstractFactory{
     public:
-        AbstractProductA* createProductA() override{
+        AbstractProductA* createProductoA() const override{
             return new CProductoA1();
         }
-        AbstractProductB* createProductB() override{
+        AbstractProductB* createProductoB() const override{
             return new CProductoB1();
         }
 };
 
 class CFactory2 : public AbstractFactory{
     public:
-        AbstractProductA* createProductA() override{
+        AbstractProductA* createProductoA() const override{
             return new CProductoA2();
         }
-        AbstractProductB* createProductB() override{
+        AbstractProductB* createProductoB() const override{
             return new CProductoB2();
         }
 };
 
 void Cliente(const AbstractFactory& f){
-    const AbstractProductA* producto_a = f.createProductA();
-    const AbstractProductB* producto_b = f.createProductB();
+    const AbstractProductA* producto_a = f.createProductoA();
+    const AbstractProductB* producto_b = f.createProductoB();
     std::cout << producto_b->Funcion1_B() << std::endl;
     std::cout << producto_b->Funcion2_B(*producto_a) << std::endl;
     delete producto_a;
