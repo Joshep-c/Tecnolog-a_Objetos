@@ -4,6 +4,9 @@
 #include <memory>
 #include <unordered_map>
 #include <ctime>
+#include <mutex>
+
+// Enumeracion para los tipos de cuenta
 enum class TipoCuenta
 {
     AHORRO,
@@ -12,83 +15,130 @@ enum class TipoCuenta
     EMPRESARIAL,
     TARJETA_CREDITO
 };
-template <typename T>
-class RepositorioSingleton
+
+// Clase base para cuentas
+class Cuenta
 {
 protected:
-    RepositorioSingleton() = default;
-    static T *instancia;
+    TipoCuenta tipo;
+    float tasaInteres;
 
 public:
-    static T *obtenerInstancia()
+    Cuenta(TipoCuenta tipo, float tasa) : tipo(tipo), tasaInteres(tasa) {}
+    virtual ~Cuenta() = default;
+
+    virtual void mostrarDetalles() const
     {
-        if (instancia == nullptr)
-        {
-            instancia = new T();
-        }
-        return instancia;
+        std::cout << "Tipo de cuenta: " << static_cast<int>(tipo)
+                  << ", Tasa de interes: " << tasaInteres << "%" << std::endl;
     }
-    virtual ~RepositorioSingleton() = default;
-    RepositorioSingleton(const RepositorioSingleton &) = delete;
-    RepositorioSingleton &operator=(const RepositorioSingleton &) = delete;
+    float getTasaInteres() const { return tasaInteres; }
+    TipoCuenta getTipo() const { return tipo; }
 };
-template <typename T>
-T *RepositorioSingleton<T>::instancia = nullptr;
-class RepositorioCuentas : public RepositorioSingleton<RepositorioCuentas>
+
+// Clases derivadas (ejemplo: Cuenta Ahorro)
+class CuentaAhorro : public Cuenta
+{
+public:
+    CuentaAhorro() : Cuenta(TipoCuenta::AHORRO, 0.5f) {}
+};
+
+// Clase Cliente
+class Cliente
 {
 private:
-    // Mapa para almacenar cuentas de clientes
-    std::unordered_map<std::string, std::vector<TipoCuenta>> cuentasClientes;
+    std::string nombre;
+    std::vector<std::shared_ptr<Cuenta>> cuentas;
 
-    // Tasas de interés por tipo de cuenta
-    std::unordered_map<TipoCuenta, float> tasasInteres = {
-        {TipoCuenta::AHORRO, 0.5f},
-        {TipoCuenta::JOVEN, 1.0f},
-        {TipoCuenta::PLUSS, 2.0f},
-        {TipoCuenta::EMPRESARIAL, 4.0f},
-        {TipoCuenta::TARJETA_CREDITO, 25.0f}};
-    friend class RepositorioSingleton<RepositorioCuentas>;
+public:
+    Cliente(const std::string &nombre) : nombre(nombre) {}
+    void agregarCuenta(std::shared_ptr<Cuenta> cuenta)
+    {
+        cuentas.push_back(cuenta);
+    }
+    void generarEstadoCuenta(time_t fechaCorte) const
+    {
+        std::cout << "---------------------------------" << std::endl;
+        std::cout << "Estado de cuenta para: " << nombre << std::endl;
+        std::cout << "Fecha de corte: " << std::ctime(&fechaCorte);
+        for (const auto &cuenta : cuentas)
+        {
+            cuenta->mostrarDetalles();
+        }
+    }
+};
+
+// Singleton para el repositorio de cuentas
+class RepositorioCuentas
+{
+private:
+    std::unordered_map<std::string, std::shared_ptr<Cliente>> clientes;
+    static std::shared_ptr<RepositorioCuentas> instancia;
+    static std::mutex mtx;
+
     RepositorioCuentas() = default;
 
 public:
-    // Registrar nueva cuenta para un cliente
-    void registrarCuenta(const std::string &nombreCliente, TipoCuenta
-                                                               tipoCuenta)
+    static std::shared_ptr<RepositorioCuentas> obtenerInstancia()
     {
-        cuentasClientes[nombreCliente].push_back(tipoCuenta);
-    }
-    // Calcular interés para un tipo de cuenta
-    float calcularInteres(TipoCuenta tipoCuenta)
-    {
-        return tasasInteres[tipoCuenta];
-    }
-    // Generar estado de cuenta
-    void generarEstadoCuenta(const std::string &nombreCliente, time_t
-                                                                   fechaCorte)
-    {
-        std::cout << "---------------------------------" << std::endl;
-        std::cout << "Estado de cuenta para: " << nombreCliente << std::endl;
-        std::cout << "Fecha de corte: " << std::ctime(&fechaCorte);
-
-        for (auto tipoCuenta : cuentasClientes[nombreCliente])
+        std::lock_guard<std::mutex> lock(mtx);
+        if (!instancia)
         {
-            std::cout << "Tipo de cuenta: "
-                      << static_cast<int>(tipoCuenta)
-                      << ", Tasa de interés: "
-                      << calcularInteres(tipoCuenta) << "%" << std::endl;
+            instancia = std::shared_ptr<RepositorioCuentas>(new RepositorioCuentas());
+        }
+        return instancia;
+    }
+
+    void registrarCliente(const std::string &nombre)
+    {
+        if (clientes.find(nombre) == clientes.end())
+        {
+            clientes[nombre] = std::make_shared<Cliente>(nombre);
+        }
+    }
+
+    void agregarCuenta(const std::string &nombre, std::shared_ptr<Cuenta> cuenta)
+    {
+        if (clientes.find(nombre) != clientes.end())
+        {
+            clientes[nombre]->agregarCuenta(cuenta);
+        }
+        else
+        {
+            std::cerr << "Cliente no registrado: " << nombre << std::endl;
+        }
+    }
+
+    void generarEstadoCuenta(const std::string &nombre, time_t fechaCorte)
+    {
+        if (clientes.find(nombre) != clientes.end())
+        {
+            clientes[nombre]->generarEstadoCuenta(fechaCorte);
+        }
+        else
+        {
+            std::cerr << "Cliente no encontrado: " << nombre << std::endl;
         }
     }
 };
+
+std::shared_ptr<RepositorioCuentas> RepositorioCuentas::instancia = nullptr;
+std::mutex RepositorioCuentas::mtx;
+
+// Ejemplo de uso
 int main()
 {
     auto repositorio = RepositorioCuentas::obtenerInstancia();
-    // Registrar cuentas para clientes
-    repositorio->registrarCuenta("Juan Perez", TipoCuenta::AHORRO);
-    repositorio->registrarCuenta("Juan Perez", TipoCuenta::TARJETA_CREDITO);
-    repositorio->registrarCuenta("Maria Garcia", TipoCuenta::EMPRESARIAL);
-    // Generar estado de cuenta
+
+    repositorio->registrarCliente("Juan Perez");
+    repositorio->registrarCliente("Maria Garcia");
+
+    repositorio->agregarCuenta("Juan Perez", std::make_shared<CuentaAhorro>());
+    repositorio->agregarCuenta("Maria Garcia", std::make_shared<CuentaAhorro>());
+
     time_t fechaCorte = time(nullptr);
     repositorio->generarEstadoCuenta("Juan Perez", fechaCorte);
     repositorio->generarEstadoCuenta("Maria Garcia", fechaCorte);
+
     return 0;
 }
